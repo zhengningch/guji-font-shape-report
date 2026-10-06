@@ -1,0 +1,207 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>古籍字体形态研究：从书影到423,987字的逐笔测量</title><style>
+:root{--ink:#172426;--green:#173c40;--paper:#f2eee4;--gold:#c28c39;--line:#d8d0c0}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;line-height:1.72}.hero{padding:60px max(28px,7vw);background:linear-gradient(120deg,#102e33,#315b58);color:white}.hero h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(38px,5vw,70px);line-height:1.12;margin:0 0 16px}.hero p{max-width:1050px;color:#dce6e2;font-size:18px}.chips{display:flex;gap:10px;flex-wrap:wrap}.chip{border:1px solid #77938e;border-radius:99px;padding:7px 12px}.wrap{max-width:1480px;margin:auto;padding:25px}.toc{columns:2;background:white;padding:20px 35px;border-radius:15px}.block{background:#fff;padding:28px;margin:24px 0;border-radius:18px;box-shadow:0 8px 30px #243b3312}.block h2{font-family:Georgia,"Songti SC",serif;font-size:31px;border-bottom:2px solid #ded7c9;padding-bottom:10px}.call{border-left:6px solid var(--gold);background:#fff4d9;padding:14px 18px}.ok{border-left-color:#38866c;background:#eaf6ef}.warn{border-left-color:#c96d3f;background:#fff0e8}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}.step{padding:15px;border:1px solid var(--line);border-radius:12px;background:#faf8f2}.step b{display:block;font-size:21px;color:#1d5f5d}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.metric{padding:16px;background:var(--green);color:white;border-radius:12px}.metric b{display:block;font-size:29px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.evidence{width:100%;border:1px solid #ddd5c7;border-radius:10px;margin:10px 0;max-height:850px;object-fit:contain;background:#eee}.wide{max-height:none}.featuregrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}.feat{border:1px solid var(--line);padding:13px;border-radius:10px}.formula{text-align:center;font:700 25px Georgia;background:#183b40;color:white;padding:18px;border-radius:12px}table{border-collapse:collapse;width:100%;font-size:12px;display:block;overflow:auto}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f4f0e7}.pages{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pagecard{border:1px solid var(--line);padding:10px;border-radius:12px;background:#faf8f3}.pagecard img{width:100%;height:500px;object-fit:contain;background:#ddd}.pagecard b,.pagecard small{display:block}.period{border-top:5px solid #567e7a;margin:22px 0}.caption{color:#64706f;font-size:13px}.axis{font-weight:700;color:#9b4f30}.anchorgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.anchorgrid img{width:100%;height:420px;object-fit:contain;background:#ddd;border-radius:10px}.atlas{width:100%;height:980px;border:1px solid var(--line);border-radius:14px;background:white}.reveal{border:1px solid var(--line);border-radius:12px;margin:12px 0;background:#faf8f2}.reveal summary{cursor:pointer;padding:14px 18px;font-weight:700;color:#1d5f5d}.reveal>div{padding:0 16px 16px}.comparegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.bookhover{position:relative;overflow:hidden;height:560px;background:#ded8ca;border-radius:10px}.bookhover img{width:100%;height:100%;object-fit:contain;transition:transform .45s ease}.bookhover:hover img{transform:scale(1.65)}.bookhover span{position:absolute;left:8px;bottom:8px;background:#102e33df;color:white;padding:7px 10px;border-radius:7px;z-index:2}.footer{background:#152d31;color:#d5dfdc;padding:30px max(25px,7vw)}a{color:#26736e}@media(max-width:900px){.flow{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.pages{grid-template-columns:1fr}.toc{columns:1}.pagecard img{height:auto}.anchorgrid{grid-template-columns:1fr}.atlas{height:760px}.comparegrid{grid-template-columns:1fr}.bookhover{height:460px}}
+</style></head><body><header class="hero"><h1>古籍字体形态研究<br>从书影到四十二万字的逐笔测量</h1><p>一份可对外介绍的工作报告：怎样从PDF书影和OCR字框出发，经过模型去噪补墨、标准逐笔联合映射、完整二维横截面测量和414维书级表征，研究宋元明清时期变化、官私差异与连续字体空间。</p><div class="chips"><span class="chip">423,987字框</span><span class="chip">391本有效书</span><span class="chip">2,894字符</span><span class="chip">23项逐笔测量</span><span class="chip">414维书级表征</span></div></header><main class="wrap"><nav class="toc"><b>目录</b><ol><li><a href="#question">问题定义</a></li><li><a href="#data">数据与全过程</a></li><li><a href="#denoise">去噪补墨模型</a></li><li><a href="#mapping">笔画提取与联合映射</a></li><li><a href="#features">414维特征工程</a></li><li><a href="#train">训练、测试与任务边界</a></li><li><a href="#period">时期显著性和两两差距</a></li><li><a href="#official">官刻与私刻</a></li><li><a href="#tri">三锚分类与清代聚类</a></li><li><a href="#limits">限制与下一步</a></li></ol></nav>
+<section class="block" id="question"><h2>一、问题怎样定义？</h2><p>核心问题不是“把每本书强行分成宋体、欧体、软体”，而是把字体拆成可连续测量的局部形态：横画是否平稳、竖画是否倾斜、撇捺怎样收放、复合笔是否曲折、首中尾粗细是否变化、左右墨区是否对称，以及这些特征在同一本书中是否一致。</p><div class="call"><b>三项研究问题</b><ol><li>宋、元、明、清及八个小时期的书级字体形态是否存在群体差异？</li><li>同一时期内部，官刻和私刻是否形成可重复的形态差异？</li><li>清代内部更适合解释为几个离散类别，还是若干连续风格轴？</li></ol></div><p>三锚本分类只保留为“与三本实体书的相似度”，不能代替完整字体类型学。《汉书评林》也不等于抽象的标准宋体。</p></section>
+<section class="block" id="data"><h2>二、从书影到研究变量：全过程</h2><div class="flow"><div class="step"><b>01 书影</b>两期古籍PDF／JPEG与书目元数据；OCR给出页码、字符和坐标框。</div><div class="step"><b>02 字框</b>按原坐标裁出423,987个字框，保存原生尺寸和来源，不覆盖原数据。</div><div class="step"><b>03 固定去噪</b>红色印记背景修复＋NLM，再以C10得到初始墨区。</div><div class="step"><b>04 补缺与逐笔映射</b>最终模型处理噪点、断裂和缺笔；标准拓扑再联合映射到候选墨区。</div><div class="step"><b>05 二维测量</b>沿每笔32个位置测量方向、法向偏移、完整横截面宽度、收放和不对称。</div></div><div class="metrics"><div class="metric"><b>423,987</b>全量字框</div><div class="metric"><b>391</b>具有有效书级表征</div><div class="metric"><b>1,114,229</b>书—字—笔画类型单位</div><div class="metric"><b>425</b>原子NPZ分片</div></div><h3>同一批字贯穿各步骤</h3><p>下面固定使用“子、之、大、有、書、水”六个真实字框：原始RGB、红修复＋NLM、C10墨区、最终模型候选和标准逐笔映射逐行一一对应，不再让不同任务各挑不同字。</p><img class="evidence wide" src="assets/同批六字_全流程统一对照.png"><p class="caption">第二列是确定采用的红修复＋NLM；第三列显示其二值化结果仍可能包含邻字、栏线或断裂；第四列是最终checkpoint输出；第五列是同一输出的逐笔联合映射。</p></section>
+<section class="block" id="denoise"><h2>三、红修复＋NLM，以及后续去噪补缺</h2><p><b>基础去噪流程已经确定：</b>先识别红色印记像素并修复背景，再运行NLM，随后以自适应C10生成初始二值墨区。这一部分就是本项目所说的“去噪”，不再改写成其他方法。</p><p>在此基础上，最终候选模型针对2,894个字符和多字体合成损坏训练，进一步处理邻字／栏线伪墨、断裂和缺笔。损失包含加权像素交叉熵、Dice和L1。上面的固定六字图可直接比较第二、三、四列。</p><div class="call warn"><b>必须说明：</b>红修复＋NLM是确定的图像处理步骤；模型输出仍是研究候选。真实历史数据没有成对清洁答案，因此不能把模型输出称为历史真迹或报告历史准确率。</div><h3>本报告是否使用最后的模型和既有数据库？</h3><div class="call ok"><b>是。</b>全量423,987字使用冻结checkpoint <code>checkpoint_epoch2.pt</code>，SHA-256：<code>9b64cee9…b39e62</code>。输入是只读的<code>native_masks.npy</code>，SHA-256：<code>ac7a55a4…a8aef</code>。43个预测分片、43个审计文件以及服务器425个特征分片均沿用已经完成并核验的正式结果，报告没有覆盖原数组，也没有换成临时模型。</div><p class="caption">本页为了统一展示六个字，只按原参数重新渲染了一次确定性的“红修复＋NLM＋C10”中间过程；最终模型、逐笔映射、414维表和统计结果直接读取既有正式产物。</p></section>
+<section class="block" id="mapping"><h2>四、笔画提取与标准逐笔联合映射</h2><p>Make Me a Hanzi提供现代标准中心线和笔顺拓扑。系统不是逐笔独立硬套，而是把一个字的全部标准笔画联合变形到模型候选墨区，保留笔画身份、共享变形关系和无法解释的残差。173个缺少资源或存在异体冲突的字符不能强制映射。</p><p>仍使用上一节固定的“子、之、大、有、書、水”：统一对照图第四列是最终模型候选，第五列是对应的彩色逐笔映射。颜色只表示笔画身份，不代表历史真实运笔。</p><h3>为什么中心线不等于粗细？</h3><p>中心线只定义沿笔位置q。粗细必须回到完整二维墨区，在中心线法向上直接测量横截面。每笔采样32个位置，得到起笔、中段、收笔和局部变化曲线。</p><img class="evidence" src="assets/04_完整二维横截面测量.jpg"><p class="caption">左侧是完整墨区与选中笔画，右侧比较标准笔面、映射后完整笔面和实际观察墨宽。研究的是完整二维笔画，不把骨架长度冒充笔画粗细。</p></section>
+<section class="block" id="features"><h2>五、414维特征工程怎样形成？</h2><div class="formula">23项去重逐笔特征 × 6类笔画 × 3种统计量 = 414维</div><div class="featuregrid"><div class="feat"><b>整笔几何（3）</b><br>整体方向偏差、长度比、法向偏移。</div><div class="feat"><b>二维宽度与端头（5）</b><br>起／中／末宽度、首尾收放、左右不对称。</div><div class="feat"><b>32点局部方向（7）</b><br>有符号平均、起中末方向、绝对偏差、方向IQR、沿笔总变化。</div><div class="feat"><b>32点法向弯曲（5）</b><br>平均及起中末法向偏移、法向IQR。</div><div class="feat"><b>宽度稳定性（2）</b><br>32点平均宽度比、沿笔宽度CV。</div><div class="feat"><b>切向错位（1）</b><br>沿笔切向偏移绝对均值。</div></div><p>六类笔画为H横、V竖、L左斜／撇、R右斜／捺、D点／短笔、C折钩／弯曲复合笔。每类分别计算mean、median和IQR，避免横竖撇捺混合后互相抵消。</p><p>正式全量分析先合并同书—同字—同类笔画，再按字符＋笔画类型跨书中心化，控制文字内容；之后回归去除P1/P2来源、原生尺寸和字符支持，最后让几何、宽度、不对称三个特征族等权。</p><div class="call"><b>不进入风格向量：</b>fit IoU、解释率、残差、原生分辨率、数据来源和字符支持。这些只用于筛选、混杂控制和质量审计。</div></section>
+<section class="block" id="train"><h2>六、训练与测试：哪些分数可以相信？</h2><h3>去噪补缺模型</h3><p>使用多字体、多损坏合成训练；最终checkpoint固定后对423,987字推理，原始数组只读。由于没有历史清洁GT，不能把合成测试IoU称为历史复原准确率。</p><h3>三锚本识别</h3><p>982个三书共享字符按589训练、196验证、197冻结测试。K=3三字联合、完整局部profile在“未见字符、已见三本实体书”上达到98.4%，但不代表未见书或通用字体类型准确率。</p><h3>414维时期监督分类</h3><img class="evidence" src="assets/414维时期分类能力.png"><p>382本书按整本留出。414维＋Logistic：八小时期平衡准确率45.9%（随机12.5%），四朝代55.1%（随机25%）；都高于置换基线p=.005，但仍只有中等预测能力，不能单独作为断代器。</p></section>
+<section class="block" id="period"><h2>七、时代是否真的有差异？怎样解释显著性？</h2><div class="grid2"><div class="call ok"><b>396/414项q&lt;.05</b><br>表示大量单变量坐标在八时期之间分布不同，且经过BH多重校正；这些坐标高度相关，不能说发现396个独立历史机制。</div><div class="call ok"><b>多变量η²=0.066，置换p=.002</b><br>时期中心解释约6.6%的总形态变异；随机打乱时期标签几乎得不到这么大的整体分离。但约93.4%变异仍在时期内部或来自其他因素。</div></div><p><b>结论：</b>时代之间存在统计可检出的群体差异，但书与书大量重叠，时代不是字体风格的唯一决定因素。“显著”不等于“差异巨大”，也不等于可准确断代。</p><img class="evidence" src="assets/05_全量时期空间.png"><h3>相邻时期变化最大在哪里？</h3><img class="evidence" src="assets/相邻时期变化距离.png"><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>period_a</th>
+      <th>period_b</th>
+      <th>centroid_distance_414</th>
+      <th>permutation_p</th>
+      <th>BH_q_28pairs</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>明前期</td>
+      <td>明嘉靖</td>
+      <td>0.992</td>
+      <td>0.001</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <td>清中期</td>
+      <td>清后期</td>
+      <td>0.852</td>
+      <td>0.002</td>
+      <td>0.006</td>
+    </tr>
+    <tr>
+      <td>明后期</td>
+      <td>清前期</td>
+      <td>0.663</td>
+      <td>0.001</td>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <td>宋</td>
+      <td>元</td>
+      <td>0.469</td>
+      <td>0.496</td>
+      <td>0.506</td>
+    </tr>
+    <tr>
+      <td>元</td>
+      <td>明前期</td>
+      <td>0.457</td>
+      <td>0.245</td>
+      <td>0.264</td>
+    </tr>
+    <tr>
+      <td>清前期</td>
+      <td>清中期</td>
+      <td>0.423</td>
+      <td>0.155</td>
+      <td>0.189</td>
+    </tr>
+    <tr>
+      <td>明嘉靖</td>
+      <td>明后期</td>
+      <td>0.326</td>
+      <td>0.213</td>
+      <td>0.239</td>
+    </tr>
+  </tbody>
+</table><p><span class="axis">相邻时期最大：</span>明前期→明嘉靖（0.992，q=.0035）；其次清中期→清后期（0.852，q=.0056）；再是明后期→清前期（0.663，q=.0035）。</p><h3>最大区间到底改变了什么？</h3><img class="evidence" src="assets/明前期_vs_明嘉靖_具体特征变化.png"><p>从明前期到明嘉靖，变化最一致的不是简单的“字变粗”或“字变细”，而是笔画内部的波动下降：局部方向偏差约从+0.226降到−0.294，方向IQR从+0.233降到−0.284，沿笔方向总变化从+0.213降到−0.251，左右不对称从+0.173降到−0.332；法向弯曲离散也同步降低。相对而言，嘉靖组的笔画更接近稳定方向、两侧墨宽更均衡，明前期组则更容易出现偏斜、局部摆动和左右宽度不匀。</p><div class="call warn">这说的是两组书的控制后平均，不是说每一本嘉靖书都比每一本明前期书规整。下面的真实书影是视觉核查实例，不是凭四页书影得出的统计结论。</div><details class="reveal"><summary>展开真实书影：明前期的两个中心样本（悬浮可局部放大）</summary><div class="comparegrid"><div class="bookhover"><img src="assets/书影切片/P2_01045_全页与局部.jpg"><span>《程氏贻范集三十卷》｜明前期</span></div><div class="bookhover"><img src="assets/书影切片/P1_036_全页与局部.jpg"><span>《静居集》｜明前期</span></div></div><p>阅读时可注意竖画与斜画方向是否稳定、长笔内部是否摆动，以及中心线两侧墨宽是否相近。第二页尤其显示较明显的书写性起伏；这类现象会推高方向离散和不对称指标。</p></details><details class="reveal"><summary>展开真实书影：明嘉靖的两个中心样本（悬浮可局部放大）</summary><div class="comparegrid"><div class="bookhover"><img src="assets/书影切片/P2_04757_全页与局部.jpg"><span>《皇明进士登科考十三卷》｜明嘉靖</span></div><div class="bookhover"><img src="assets/书影切片/P2_04784_全页与局部.jpg"><span>《皇明诗钞五卷》｜明嘉靖</span></div></div><p>可对照观察横竖笔的方向一致性、长笔的局部摆动和字内墨宽平衡。它们只代表接近嘉靖组质心的实例，不代表全部嘉靖刊本。</p></details><details class="reveal"><summary>展开PDF来源与标签版本表</summary><div><p>四页均按PDF合并页序取中间页，并直接提取PDF内嵌原图；右侧局部切片来自同一页，没有另换样本。标签读取自冻结表<code>16_Mac训练必要资源/data/book_labels.csv</code>，SHA-256：<code>cb659ff8d561528d869dabc80a17a5e2252562df8c587a5ef903b0defba06329</code>。</p><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>书号</th>
+      <th>书名</th>
+      <th>版本著录</th>
+      <th>影像来源</th>
+      <th>PDF文件／公开入口</th>
+      <th>本页位置</th>
+      <th>时期标签</th>
+      <th>官私</th>
+      <th>标签依据</th>
+      <th>标签状态</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>P2:01045</td>
+      <td>程氏貽範集三十卷</td>
+      <td>明成化間刻本</td>
+      <td>台湾图书馆古籍资源（台图特藏）</td>
+      <td>01045·程氏貽範集三十卷_明程敏政輯_明成化間刻本.pdf</td>
+      <td>合并页序 361/722</td>
+      <td>明前期</td>
+      <td>私</td>
+      <td>版本年号：成化</td>
+      <td>年号映射</td>
+    </tr>
+    <tr>
+      <td>P1:036</td>
+      <td>静居集</td>
+      <td>明初本</td>
+      <td>中国国家图书馆</td>
+      <td>http://read.nlc.cn/allSearch/searchDetail?searchType=10024&amp;showType=1&amp;indexName=data_892&amp;fid=4119990134957</td>
+      <td>合并页序 82/163</td>
+      <td>明前期</td>
+      <td>私</td>
+      <td>一期明初本/明前期体系标签；嘉靖之前宽分期</td>
+      <td>体系标签</td>
+    </tr>
+    <tr>
+      <td>P2:04757</td>
+      <td>皇明進士登科考十三卷</td>
+      <td>明嘉靖間刻本</td>
+      <td>台湾图书馆古籍资源（台图特藏）</td>
+      <td>04757·皇明進士登科考十三卷_明嘉靖間刻本.pdf</td>
+      <td>合并页序 256/512</td>
+      <td>明嘉靖</td>
+      <td>私</td>
+      <td>版本年号：嘉靖</td>
+      <td>年号映射</td>
+    </tr>
+    <tr>
+      <td>P2:04784</td>
+      <td>皇明詩鈔五卷</td>
+      <td>明嘉靖間刻本</td>
+      <td>台湾图书馆古籍资源（台图特藏）</td>
+      <td>04784·皇明詩鈔五卷_明楊慎輯_明陳仕賢序_明嘉靖間刻本.pdf</td>
+      <td>合并页序 37/73</td>
+      <td>明嘉靖</td>
+      <td>私</td>
+      <td>版本年号：嘉靖</td>
+      <td>年号映射</td>
+    </tr>
+  </tbody>
+</table><p class="caption">“PDF文件／公开入口”保留书目表中的公开入口或馆藏文件名，不公开服务器内部绝对路径。标签是项目版本学标签，不等于仅从字形反推的年代真值。</p></div></details><h3>先看懂这些指标是什么意思</h3><img class="evidence" src="assets/可解释笔画变量_六项示意图.png"><p>方向偏差看观察笔画相对标准方向偏了多少；方向IQR和沿笔总变化描述一笔内部是否来回摆动；法向偏移描述中心线向侧面弯曲；左右不对称比较中心线两侧墨宽；宽度CV描述粗细是否忽宽忽窄；首尾收放比较起、中、末端宽度。下面的时期曲线正是这些量在真实书稿中的控制后平均。</p><h3>具体趋势是什么？</h3><img class="evidence" src="assets/时代可解释特征趋势.png"><ul><li><b>宋：</b>平均笔画长度偏高，但局部方向变化、不对称和宽度变异相对低。</li><li><b>元—明前期：</b>局部方向偏差和方向离散上升，明前期达到一个相对高点。</li><li><b>明嘉靖：</b>方向离散、沿笔变化和不对称显著回落，形成明前期→嘉靖的大幅重排。</li><li><b>明后期：</b>整体仍偏规则，和嘉靖距离较小。</li><li><b>清前期：</b>方向变化和左右不对称重新上升。</li><li><b>清中期：</b>多数指标回到中间位置。</li><li><b>清后期：</b>长度、方向偏差、方向离散、法向弯曲、不对称和宽度变异普遍升高，因此与嘉靖、明后期、宋元等多个时期距离较大。</li></ul><div class="call warn">这些是群体均值的阶段性起伏，不是“字体沿单一路线越来越进化”。清后期高值也可能混合写刻体比例、地域、版刻类型和存世书构成。</div></section>
+<section class="block" id="official"><h2>八、官刻与私刻有没有显著差距？</h2><img class="evidence" src="assets/分期官私距离与显著性.png"><p>距离最大的清后期、宋和清前期仍未达到时期内部置换p&lt;.05；414维逐特征共有3,312项时期内比较，BH校正后0项q&lt;.05。</p><div class="call"><b>目前可说：</b>各时期官私中心距离有起伏。<br><b>目前不可说：</b>官刻和私刻构成跨时期固定、稳定显著的两类字体。</div><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>period</th>
+      <th>official_books</th>
+      <th>private_books</th>
+      <th>centroid_distance_414</th>
+      <th>permutation_p</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>清后期</td>
+      <td>7</td>
+      <td>17</td>
+      <td>0.909</td>
+      <td>0.145</td>
+    </tr>
+    <tr>
+      <td>宋</td>
+      <td>7</td>
+      <td>11</td>
+      <td>0.841</td>
+      <td>0.129</td>
+    </tr>
+    <tr>
+      <td>清前期</td>
+      <td>7</td>
+      <td>57</td>
+      <td>0.780</td>
+      <td>0.358</td>
+    </tr>
+    <tr>
+      <td>元</td>
+      <td>5</td>
+      <td>8</td>
+      <td>0.636</td>
+      <td>0.657</td>
+    </tr>
+    <tr>
+      <td>明后期</td>
+      <td>14</td>
+      <td>124</td>
+      <td>0.619</td>
+      <td>0.098</td>
+    </tr>
+    <tr>
+      <td>清中期</td>
+      <td>13</td>
+      <td>48</td>
+      <td>0.494</td>
+      <td>0.902</td>
+    </tr>
+    <tr>
+      <td>明前期</td>
+      <td>14</td>
+      <td>13</td>
+      <td>0.492</td>
+      <td>0.205</td>
+    </tr>
+    <tr>
+      <td>明嘉靖</td>
+      <td>15</td>
+      <td>22</td>
+      <td>0.269</td>
+      <td>0.988</td>
+    </tr>
+  </tbody>
+</table></section>
+<section class="block" id="tri"><h2>九、三锚分类与清代无监督聚类</h2><h3>三分类任务是什么？</h3><p>三类不是抽象的“宋体／欧体／软体”，而是三本具体实体锚书：①《汉书评林》，②《唐诗百名家全集》，③《全唐诗》。模型每次联合三个不同字符，并要求笔画类型覆盖，用23项逐笔特征和32点局部profile判断更像哪一本实体书。</p><div class="anchorgrid"><div><img src="assets/三锚_汉书评林.jpg"><b>《汉书评林》实体锚</b></div><div><img src="assets/三锚_唐诗百名家.jpg"><b>《唐诗百名家全集》实体锚</b></div><div><img src="assets/三锚_全唐诗.jpg"><b>《全唐诗》实体锚</b></div></div><h3>找到了什么？</h3><ul><li>冻结字符测试准确率98.4%，含义是“未见字符、但仍是已见三本书”。</li><li>投影到清代154本：139本最接近《汉书评林》、3本最接近《唐诗百名家全集》、6本最接近《全唐诗》、6本证据不足。</li><li>这一结果明显不平衡，只能报告实体锚相似度，不能把139本直接叫作某种通用字体。</li></ul><h3>清代无监督空间</h3><p>不使用三锚标签独立拟合清代空间。诊断性K=3规模为10／82／53，silhouette仅0.136；聚类与监督三锚标签的一致性很低（ARI约0.027，NMI约0.045）。因此更合理的解释是连续形态地图，而不是天然三种字体。</p><div class="call ok"><b>下面已经把原交互地图直接嵌入本报告。</b>先看三锚概率三角图，再看无监督PC1／PC2；把鼠标放到点上即可显示该书真实中间页，点击可锁定。不需要跳转到另一页。</div><iframe class="atlas" src="interactive_atlas/index.html" loading="lazy" title="清代154本交互书影地图"></iframe></section>
+<section class="block" id="limits"><h2>研究边界与下一步</h2><ol><li>Make Me a Hanzi是现代标准拓扑，不是历史真实运笔；异体冲突时应拒绝强套。</li><li>没有历史清洁GT，去噪、补墨和残差不能自动证明历史正确。</li><li>时期差异是关联，不是时代的因果效应；地域、刊刻机构和版本系统仍可能混杂。</li><li>官私样本高度不平衡，例如明后期私刻远多于官刻，未显著不等于绝对无差异。</li><li>时期分类目前为探索性：特征中心化和残差化在交叉验证前完成，正式发表需要完整嵌套到训练折。</li><li>下一步应把高低趋势书的整页、局部放大和同字逐笔剖面并排，进行不知道数值的盲审。</li></ol></section></main><footer class="footer">本报告将“复原候选”“标准逐笔坐标”“可解释形态测量”和“历史关联”分开陈述。最终目标不是把复杂古籍字体压成几个名称，而是建立可复核、可比较、可回到真实书影检查的连续研究变量。</footer></body></html>
